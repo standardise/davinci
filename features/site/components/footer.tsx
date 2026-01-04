@@ -9,9 +9,8 @@ export function Footer() {
   return (
     <footer
       id="company"
-      className="relative border-t border-border bg-background pt-20 pb-10 px-4 lg:px-8 overflow-hidden transition-colors duration-300"
+      className="relative bg-background pt-20 pb-10 px-4 lg:px-8 overflow-hidden transition-colors duration-300"
     >
-      {/* Background Glow - จางๆ นุ่มๆ */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-150 h-75 bg-blue-500/5 dark:bg-blue-900/10 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="container mx-auto relative z-10">
