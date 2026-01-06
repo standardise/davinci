@@ -2,11 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User as UserIcon } from "lucide-react";
 import Link from "next/link";
 import { ModeToggle } from "@/components/mode-toggle";
+import { useAuth } from "@/features/auth/context/auth-provider";
 
 export function Navigation() {
+  const { user, isLoading } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -18,10 +20,9 @@ export function Navigation() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ปิดเมนูเมื่อ Scroll หรือเปลี่ยนหน้า
   useEffect(() => {
     if (mobileMenuOpen) {
-      document.body.style.overflow = "hidden"; // ล็อก scroll เมื่อเปิดเมนู
+      document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
     }
@@ -53,6 +54,7 @@ export function Navigation() {
               </span>
             </div>
 
+            {/* Desktop Menu */}
             <div className="hidden md:flex items-center gap-8">
               {navLinks.map((link) => (
                 <a
@@ -67,19 +69,52 @@ export function Navigation() {
 
             <div className="hidden md:flex items-center gap-4">
               <ModeToggle />
-              <Button
-                variant="ghost"
-                className="text-muted-foreground hover:text-primary"
-                asChild
-              >
-                <Link href={"/signin"}>Sign in</Link>
-              </Button>
-              <Button
-                className="rounded-full px-6 font-medium shadow-lg shadow-primary/20"
-                asChild
-              >
-                <Link href={"/projects"}>Get Started</Link>
-              </Button>
+
+              {!isLoading && (
+                <>
+                  {user ? (
+                    <Link
+                      href="/account"
+                      className="flex items-center gap-3 pl-1 pr-4 py-1 rounded-full border border-border/60 bg-background/50 hover:bg-accent/50 hover:border-primary/20 transition-all group"
+                    >
+                      <div className="h-8 w-8 rounded-full bg-primary/10 overflow-hidden flex items-center justify-center border border-border shrink-0">
+                        {user.avatar_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={user.avatar_url}
+                            alt={user.name}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-xs font-bold uppercase text-primary">
+                            {user.name?.charAt(0) || "U"}
+                          </span>
+                        )}
+                      </div>
+
+                      <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors max-w-25 truncate">
+                        {user.name}
+                      </span>
+                    </Link>
+                  ) : (
+                    <>
+                      <Button
+                        variant="ghost"
+                        className="text-muted-foreground hover:text-primary"
+                        asChild
+                      >
+                        <Link href={"/signin"}>Sign in</Link>
+                      </Button>
+                      <Button
+                        className="rounded-full px-6 font-medium shadow-lg shadow-primary/20"
+                        asChild
+                      >
+                        <Link href={"/projects"}>Get Started</Link>
+                      </Button>
+                    </>
+                  )}
+                </>
+              )}
             </div>
 
             <div className="flex md:hidden items-center gap-2">
@@ -103,6 +138,29 @@ export function Navigation() {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-90 bg-background md:hidden animate-in fade-in duration-300">
           <div className="flex flex-col h-full pt-32 pb-10 px-6 overflow-y-auto">
+            {user && (
+              <div className="mb-8 flex items-center gap-4 p-4 rounded-2xl bg-muted/30 border border-border">
+                <div className="h-12 w-12 rounded-full bg-primary/10 overflow-hidden flex items-center justify-center border border-border shrink-0">
+                  {user.avatar_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={user.avatar_url}
+                      alt={user.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-lg font-bold uppercase text-primary">
+                      {user.name?.charAt(0) || "U"}
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <p className="font-bold text-lg">{user.name}</p>
+                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                </div>
+              </div>
+            )}
+
             <div className="flex flex-col space-y-6">
               {navLinks.map((link) => (
                 <a
@@ -117,21 +175,35 @@ export function Navigation() {
             </div>
 
             <div className="mt-auto space-y-4 pt-10">
-              <Button
-                variant="outline"
-                className="w-full h-14 rounded-2xl text-lg border-border"
-                asChild
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <Link href={"/signin"}>Sign in</Link>
-              </Button>
-              <Button
-                className="w-full h-14 rounded-2xl text-lg font-bold"
-                asChild
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <Link href={"/projects"}>Get Started</Link>
-              </Button>
+              {user ? (
+                <Button
+                  className="w-full h-14 rounded-2xl text-lg font-bold"
+                  asChild
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Link href={"/account"}>
+                    <UserIcon className="mr-2 h-5 w-5" /> Manage Account
+                  </Link>
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    className="w-full h-14 rounded-2xl text-lg border-border"
+                    asChild
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Link href={"/signin"}>Sign in</Link>
+                  </Button>
+                  <Button
+                    className="w-full h-14 rounded-2xl text-lg font-bold"
+                    asChild
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Link href={"/projects"}>Get Started</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
