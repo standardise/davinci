@@ -21,7 +21,6 @@ export default function SignInPage() {
     setError(null);
     setIsLoading(true);
 
-    // Validation ง่ายๆ
     if (!email || !password) {
       setError("Please enter both email and password.");
       setIsLoading(false);
@@ -52,11 +51,6 @@ export default function SignInPage() {
 
         <div className="w-full mt-10 max-w-md relative z-10">
           <div className="text-center mb-8">
-            <Link href="/" className="inline-block mb-6">
-              <span className="text-2xl font-bold text-foreground tracking-tight italic">
-                Davinci
-              </span>
-            </Link>
             <h1 className="text-2xl font-bold text-foreground tracking-tight">
               Welcome back
             </h1>

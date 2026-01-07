@@ -11,7 +11,13 @@ import { useRouter } from "next/navigation";
 import { axiosInstance } from "@/lib/api";
 import { User } from "@/features/auth/types";
 import { AxiosError } from "axios";
-import { RegisterCredentials, SignIn, SignUp } from "@/features/auth/api";
+import {
+  GetUserProfile,
+  RegisterCredentials,
+  SignIn,
+  SignUp,
+} from "@/features/auth/api";
+import Cookies from "js-cookie"; // Import
 
 interface AuthContextType {
   user: User | null;
@@ -48,9 +54,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const { data } = await SignIn({ email, password });
 
-      localStorage.setItem("token", data.token);
-      setUser(data.user);
+      Cookies.set("access_token", data.access_token, { expires: 1, path: "/" });
 
+      setUser(data.user);
       router.push("/");
       return { success: true };
     } catch (err) {
@@ -66,7 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const { data } = await SignUp(credentials);
 
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("access_token", data.access_token);
       setUser(data.user);
 
       router.push("/");
@@ -82,15 +88,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    Cookies.remove("access_token");
     setUser(null);
     router.push("/signin");
   };
 
+  const verifySession = async () => {
+    try {
+      const { data } = await GetUserProfile();
+      setUser(data);
+    } catch (error) {
+      console.log("Session expired or invalid" + error);
+      logout();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = Cookies.get("access_token");
+
     if (token) {
-      fetchUser();
+      verifySession();
     } else {
       setIsLoading(false);
     }

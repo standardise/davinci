@@ -1,3 +1,5 @@
+"use client";
+
 import GuestGuard from "@/features/auth/components/guest-guard";
 import React from "react";
 

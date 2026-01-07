@@ -48,7 +48,6 @@ export default function AccountPage() {
     <AuthGuard>
       <div className="min-h-screen bg-background pb-12">
         <div className="container mx-auto px-4 lg:px-8 max-w-6xl">
-          {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold tracking-tight">
               Account Settings
@@ -59,7 +58,6 @@ export default function AccountPage() {
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* Sidebar Navigation */}
             <aside className="lg:w-64 shrink-0 space-y-2">
               {TABS.map((tab) => {
                 const Icon = tab.icon;

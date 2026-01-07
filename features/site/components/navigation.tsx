@@ -6,6 +6,7 @@ import { Menu, X, User as UserIcon } from "lucide-react";
 import Link from "next/link";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useAuth } from "@/features/auth/context/auth-provider";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function Navigation() {
   const { user, isLoading } = useAuth();
@@ -70,31 +71,21 @@ export function Navigation() {
             <div className="hidden md:flex items-center gap-4">
               <ModeToggle />
 
+              <Button
+                className="rounded-full px-6 font-medium shadow-lg shadow-primary/20"
+                asChild
+              >
+                <Link href={"/dashboard"}>Get Started</Link>
+              </Button>
+
               {!isLoading && (
                 <>
                   {user ? (
-                    <Link
-                      href="/account"
-                      className="flex items-center gap-3 pl-1 pr-4 py-1 rounded-full border border-border/60 bg-background/50 hover:bg-accent/50 hover:border-primary/20 transition-all group"
-                    >
-                      <div className="h-8 w-8 rounded-full bg-primary/10 overflow-hidden flex items-center justify-center border border-border shrink-0">
-                        {user.avatar_url ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={user.avatar_url}
-                            alt={user.name}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <span className="text-xs font-bold uppercase text-primary">
-                            {user.name?.charAt(0) || "U"}
-                          </span>
-                        )}
-                      </div>
-
-                      <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors max-w-25 truncate">
-                        {user.name}
-                      </span>
+                    <Link href={"/dashboard/account"}>
+                      <Avatar>
+                        <AvatarImage src={user.avatar_url} alt={user.name} />
+                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
                     </Link>
                   ) : (
                     <>
@@ -109,7 +100,7 @@ export function Navigation() {
                         className="rounded-full px-6 font-medium shadow-lg shadow-primary/20"
                         asChild
                       >
-                        <Link href={"/projects"}>Get Started</Link>
+                        <Link href={"/dashboard"}>Get Started</Link>
                       </Button>
                     </>
                   )}
@@ -181,7 +172,7 @@ export function Navigation() {
                   asChild
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <Link href={"/account"}>
+                  <Link href={"/dasboard/account"}>
                     <UserIcon className="mr-2 h-5 w-5" /> Manage Account
                   </Link>
                 </Button>
@@ -200,7 +191,7 @@ export function Navigation() {
                     asChild
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <Link href={"/projects"}>Get Started</Link>
+                    <Link href={"/dashboard"}>Get Started</Link>
                   </Button>
                 </>
               )}

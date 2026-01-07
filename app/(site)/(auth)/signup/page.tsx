@@ -76,11 +76,6 @@ export default function SignUpPage() {
 
         <div className="w-full mt-10 max-w-md relative z-10">
           <div className="text-center mb-10">
-            <Link href="/" className="inline-block mb-6">
-              <span className="text-2xl font-bold text-foreground tracking-tight italic">
-                Davinci
-              </span>
-            </Link>
             <h1 className="text-2xl font-bold text-foreground tracking-tight">
               Create an account
             </h1>
@@ -93,7 +88,6 @@ export default function SignUpPage() {
             <div className="absolute inset-0 bg-linear-to-br from-white/2 to-transparent pointer-events-none rounded-3xl" />
 
             <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
-              {/* --- 🔴 ส่วนแสดง Error Message --- */}
               {error && (
                 <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-500/10 border border-red-500/20 rounded-lg animate-in fade-in slide-in-from-top-1">
                   <AlertCircle className="w-4 h-4 shrink-0" />

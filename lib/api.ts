@@ -1,4 +1,5 @@
 import axios, { InternalAxiosRequestConfig, AxiosError } from "axios";
+import Cookies from "js-cookie";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -11,15 +12,29 @@ export const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Note: ใน Next.js Client Component ยังใช้ localStorage ได้
-    // แต่ถ้าอยาก Advance ต้องเปลี่ยนไปใช้ Cookies (js-cookie) ครับ
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token");
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+    const token = Cookies.get("access_token");
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error: AxiosError) => Promise.reject(error)
+);
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    if (error.response?.status === 401) {
+      Cookies.remove("access_token");
+
+      if (
+        typeof window !== "undefined" &&
+        !window.location.pathname.includes("/signin")
+      ) {
+        window.location.href = "/signin";
+      }
+    }
+    return Promise.reject(error);
+  }
 );

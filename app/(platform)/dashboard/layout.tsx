@@ -28,14 +28,14 @@ export default function PlatformLayout({
   const pathname = usePathname();
 
   const menuItems = [
-    { name: "Applications", href: "/projects", icon: LayoutGrid },
-    { name: "Datasets", href: "/datasets", icon: Database },
-    { name: "Predictions", href: "/predictions", icon: BarChart3 },
+    { name: "Applications", href: "/dashboard/applications", icon: LayoutGrid },
+    { name: "Datasets", href: "/dashboard/datasets", icon: Database },
+    { name: "Predictions", href: "/dashboard/predictions", icon: BarChart3 },
   ];
 
   const subItems = [
-    { name: "Billing & Usage", href: "/billing", icon: CreditCard },
-    { name: "Settings", href: "/settings", icon: Settings },
+    { name: "Billing & Usage", href: "/dashboard/billing", icon: CreditCard },
+    { name: "Settings", href: "/dashboard/settings", icon: Settings },
   ];
 
   return (
@@ -148,7 +148,7 @@ export default function PlatformLayout({
 
               <div className="mt-4 p-3 rounded-2xl border border-white/5 bg-white/2 hover:bg-white/5 transition-all cursor-pointer group flex items-center justify-between">
                 <div className="flex items-center gap-3 overflow-hidden">
-                  <Link href={"/account"}>
+                  <Link href={"/dashboard/account"}>
                     <div className="w-8 h-8 rounded-full bg-linear-to-tr from-blue-500/30 to-indigo-500/30 border border-white/10 flex items-center justify-center text-[10px] font-bold shrink-0">
                       JD
                     </div>
