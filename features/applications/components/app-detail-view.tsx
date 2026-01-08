@@ -34,6 +34,7 @@ import {
   DeleteApp,
   GetApp,
   StartTraining,
+  UpdateConfiguration,
 } from "@/features/applications/api";
 import AuthGuard from "@/features/auth/components/auth-guard";
 import { ApplicationStatusBadge } from "@/features/applications/components/application-status-badge";
@@ -48,10 +49,20 @@ export default function AppDetailView({ id }: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [isActionLoading, setIsActionLoading] = useState(false);
 
+  // Settings State
+  const [settingsForm, setSettingsForm] = useState({
+    name: "",
+    description: "",
+  });
+
   const fetchData = useCallback(async () => {
     try {
       const { data } = await GetApp(id);
       setApp(data);
+      setSettingsForm({
+        name: data.name,
+        description: data.description,
+      });
     } catch (err) {
       console.error(err);
     } finally {
@@ -91,6 +102,19 @@ export default function AppDetailView({ id }: Props) {
     try {
       await CancelTraining(id);
       fetchData();
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const handleUpdateSettings = async () => {
+    setIsActionLoading(true);
+    try {
+      await UpdateConfiguration(id, settingsForm);
+      fetchData();
+      alert("Settings updated successfully");
+    } catch (error) {
+      alert("Failed to update settings");
     } finally {
       setIsActionLoading(false);
     }
@@ -236,7 +260,7 @@ export default function AppDetailView({ id }: Props) {
                       Metrics from the latest successful build.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-y-6">
                     {app.metrics ? (
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {Object.entries(app.metrics).map(([key, value]) => (
@@ -265,6 +289,30 @@ export default function AppDetailView({ id }: Props) {
                         >
                           Start your first training
                         </Button>
+                      </div>
+                    )}
+
+                    {/* Input Schema Visualization */}
+                    {app.input_schema && app.input_schema.length > 0 && (
+                      <div className="pt-4 border-t border-border">
+                        <h4 className="text-sm font-semibold mb-3">
+                          Features Used ({app.input_schema.length})
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {app.input_schema.map((feature) => (
+                            <Badge
+                              key={feature.name}
+                              variant="secondary"
+                              className="font-mono text-xs"
+                              title={`${feature.name} (${feature.data_type})`}
+                            >
+                              {feature.name}
+                              <span className="opacity-50 ml-1">
+                                :{feature.data_type.toLowerCase()}
+                              </span>
+                            </Badge>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </CardContent>
@@ -351,7 +399,7 @@ export default function AppDetailView({ id }: Props) {
                     <div className="font-medium font-mono flex items-center gap-2">
                       <Database className="w-4 h-4 text-muted-foreground" />
                       <Link
-                        href={`/datasets/${app.dataset_reference}`}
+                        href={`/dashboard/datasets/${app.dataset_reference}`}
                         className="hover:underline hover:text-primary"
                       >
                         {app.dataset_reference}
@@ -433,17 +481,38 @@ export default function AppDetailView({ id }: Props) {
                   <div className="grid gap-2 max-w-md">
                     <Label>Project Name</Label>
                     <div className="flex gap-2">
-                      <Input defaultValue={app.name} />
-                      <Button variant="outline">Save</Button>
+                      <Input
+                        value={settingsForm.name}
+                        onChange={(e) =>
+                          setSettingsForm({
+                            ...settingsForm,
+                            name: e.target.value,
+                          })
+                        }
+                      />
                     </div>
                   </div>
                   <div className="grid gap-2 max-w-md">
                     <Label>Description</Label>
                     <div className="flex gap-2">
-                      <Input defaultValue={app.description} />
-                      <Button variant="outline">Save</Button>
+                      <Input
+                        value={settingsForm.description}
+                        onChange={(e) =>
+                          setSettingsForm({
+                            ...settingsForm,
+                            description: e.target.value,
+                          })
+                        }
+                      />
                     </div>
                   </div>
+                  <Button
+                    onClick={handleUpdateSettings}
+                    disabled={isActionLoading}
+                    variant="outline"
+                  >
+                    Save Changes
+                  </Button>
                 </CardContent>
               </Card>
 

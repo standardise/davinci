@@ -71,36 +71,37 @@ export function Navigation() {
             <div className="hidden md:flex items-center gap-4">
               <ModeToggle />
 
-              <Button
-                className="rounded-full px-6 font-medium shadow-lg shadow-primary/20"
-                asChild
-              >
-                <Link href={"/dashboard"}>Get Started</Link>
-              </Button>
-
               {!isLoading && (
                 <>
                   {user ? (
-                    <Link href={"/dashboard/account"}>
-                      <Avatar>
-                        <AvatarImage src={user.avatar_url} alt={user.name} />
-                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                    </Link>
+                    <>
+                      <Button
+                        className="rounded-full px-6 font-medium shadow-lg shadow-primary/20"
+                        asChild
+                      >
+                        <Link href={"/dashboard"}>Dashboard</Link>
+                      </Button>
+                      <Link href={"/dashboard/account"}>
+                        <Avatar>
+                          <AvatarImage src={user.avatar_url} alt={user.name} />
+                          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                      </Link>
+                    </>
                   ) : (
                     <>
+                      <Button
+                        className="rounded-full px-6 font-medium shadow-lg shadow-primary/20"
+                        asChild
+                      >
+                        <Link href={"/dashboard"}>Get Started</Link>
+                      </Button>
                       <Button
                         variant="ghost"
                         className="text-muted-foreground hover:text-primary"
                         asChild
                       >
                         <Link href={"/signin"}>Sign in</Link>
-                      </Button>
-                      <Button
-                        className="rounded-full px-6 font-medium shadow-lg shadow-primary/20"
-                        asChild
-                      >
-                        <Link href={"/dashboard"}>Get Started</Link>
                       </Button>
                     </>
                   )}

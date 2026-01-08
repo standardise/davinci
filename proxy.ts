@@ -6,9 +6,9 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get("access_token")?.value;
   const isProtectedRoute =
     request.nextUrl.pathname.startsWith("/dashboard") ||
-    request.nextUrl.pathname.startsWith("/projects") ||
-    request.nextUrl.pathname.startsWith("/datasets") ||
-    request.nextUrl.pathname.startsWith("/account");
+    request.nextUrl.pathname.startsWith("/dashboard/projects") ||
+    request.nextUrl.pathname.startsWith("/dashboard/datasets") ||
+    request.nextUrl.pathname.startsWith("/dashboard/account");
 
   if (isProtectedRoute && !token) {
     return NextResponse.redirect(new URL("/signin", request.url));
@@ -18,7 +18,7 @@ export function proxy(request: NextRequest) {
     request.nextUrl.pathname === "/signin" ||
     request.nextUrl.pathname === "/signup";
   if (isAuthPage && token) {
-    return NextResponse.redirect(new URL("/projects", request.url));
+    return NextResponse.redirect(new URL("/dashboard/projects", request.url));
   }
 
   return NextResponse.next();
@@ -27,10 +27,10 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/dashboard/:path*",
-    "/projects/:path*",
-    "/datasets/:path*",
-    "/account/:path*",
-    "/signin",
-    "/signup",
+    "/dashboard/projects/:path*",
+    "/dashboard/datasets/:path*",
+    "/dashboard/account/:path*",
+    "/dashboard/signin",
+    "/dashboard/signup",
   ],
 };

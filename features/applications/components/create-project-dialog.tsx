@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch"; // ใช้เปิด/ปิด Time Series
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -23,15 +23,29 @@ import {
 } from "@/components/ui/select";
 import { Plus, Loader2 } from "lucide-react";
 import { Dataset } from "@/features/datasets/types";
-import { ListDatasets } from "@/features/datasets/api";
+import { ListDatasets } from "@/features/datasets/api"; // สมมติว่ามี GetDataset ถ้า List ไม่ส่ง schema มา
 import { CreateApp } from "../api";
+
+const ColumnItem = ({ name, type }: { name: string; type: string }) => (
+  <div className="flex items-center justify-between w-full">
+    <span>{name}</span>
+    <span className="text-[10px] text-muted-foreground uppercase bg-muted px-1.5 py-0.5 rounded font-mono">
+      {type}
+    </span>
+  </div>
+);
 
 export function CreateProjectDialog({ onSuccess }: { onSuccess: () => void }) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [datasets, setDatasets] = useState<Dataset[]>([]);
 
-  // State หลัก
+  // Data
+  const [datasets, setDatasets] = useState<Dataset[]>([]);
+  const [availableColumns, setAvailableColumns] = useState<
+    { name: string; type: string }[]
+  >([]); // 👈 เก็บ Columns ของ Dataset ที่เลือก
+
+  // Form State
   const [isTimeSeries, setIsTimeSeries] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -41,15 +55,14 @@ export function CreateProjectDialog({ onSuccess }: { onSuccess: () => void }) {
     id_column: "",
   });
 
-  // State สำหรับ Time Series Config
   const [tsData, setTsData] = useState({
     time_column: "",
     group_column: "",
-    frequency: "D", // Default Day
+    frequency: "D",
     forecast_horizon: 7,
   });
 
-  // Load Datasets ตอนเปิด Dialog
+  // Load Datasets
   useEffect(() => {
     if (open) {
       ListDatasets()
@@ -60,6 +73,26 @@ export function CreateProjectDialog({ onSuccess }: { onSuccess: () => void }) {
         .catch(console.error);
     }
   }, [open]);
+
+  // Handle Dataset Selection
+  const handleDatasetChange = (datasetId: string) => {
+    // 1. Update Form
+    setFormData((prev) => ({
+      ...prev,
+      dataset_reference: datasetId,
+      target_column: "", // Reset columns when dataset changes
+      id_column: "",
+    }));
+    setTsData((prev) => ({ ...prev, time_column: "", group_column: "" }));
+
+    // 2. Find selected dataset to get columns
+    const selected = datasets.find((d) => d.id === datasetId);
+    if (selected && selected.schema) {
+      setAvailableColumns(selected.schema);
+    } else {
+      setAvailableColumns([]);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,6 +142,7 @@ export function CreateProjectDialog({ onSuccess }: { onSuccess: () => void }) {
       frequency: "D",
       forecast_horizon: 7,
     });
+    setAvailableColumns([]);
   };
 
   return (
@@ -159,9 +193,7 @@ export function CreateProjectDialog({ onSuccess }: { onSuccess: () => void }) {
             </Label>
             <Select
               value={formData.dataset_reference}
-              onValueChange={(val) =>
-                setFormData({ ...formData, dataset_reference: val })
-              }
+              onValueChange={handleDatasetChange}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select a dataset..." />
@@ -181,29 +213,65 @@ export function CreateProjectDialog({ onSuccess }: { onSuccess: () => void }) {
               <Label>
                 Target Column <span className="text-red-500">*</span>
               </Label>
-              <Input
+              {/* เปลี่ยนเป็น Select */}
+              <Select
                 value={formData.target_column}
-                onChange={(e) =>
-                  setFormData({ ...formData, target_column: e.target.value })
+                onValueChange={(val) =>
+                  setFormData({ ...formData, target_column: val })
                 }
-                placeholder="Column to predict"
-                required
-              />
+                disabled={!formData.dataset_reference}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={
+                      formData.dataset_reference
+                        ? "Select column"
+                        : "Select dataset first"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableColumns.map((col) => (
+                    <SelectItem key={col.name} value={col.name}>
+                      <ColumnItem name={col.name} type={col.type} />
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+
             <div className="grid gap-2">
               <Label>ID Column (Optional)</Label>
-              <Input
+              {/* เปลี่ยนเป็น Select */}
+              <Select
                 value={formData.id_column}
-                onChange={(e) =>
-                  setFormData({ ...formData, id_column: e.target.value })
+                onValueChange={(val) =>
+                  setFormData({ ...formData, id_column: val })
                 }
-                placeholder="Unique ID column"
-              />
+                disabled={!formData.dataset_reference}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select column (Unique ID)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem
+                    value="none_id_col"
+                    className="text-muted-foreground italic"
+                  >
+                    None
+                  </SelectItem>
+                  {availableColumns.map((col) => (
+                    <SelectItem key={col.name} value={col.name}>
+                      <ColumnItem name={col.name} type={col.type} />
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
           {/* Time Series Toggle */}
-          <div className="flex items-center justify-between rounded-lg border p-4">
+          <div className="flex items-center justify-between rounded-lg border p-4 bg-muted/10">
             <div className="space-y-0.5">
               <Label className="text-base">Time Series Forecasting</Label>
               <p className="text-xs text-muted-foreground">
@@ -215,30 +283,61 @@ export function CreateProjectDialog({ onSuccess }: { onSuccess: () => void }) {
 
           {/* Time Series Config (Show if Toggled) */}
           {isTimeSeries && (
-            <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-dashed">
+            <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-dashed animate-in slide-in-from-top-2">
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label>Time Column</Label>
-                  <Input
+                  {/* เปลี่ยนเป็น Select */}
+                  <Select
                     value={tsData.time_column}
-                    onChange={(e) =>
-                      setTsData({ ...tsData, time_column: e.target.value })
+                    onValueChange={(val) =>
+                      setTsData({ ...tsData, time_column: val })
                     }
-                    placeholder="Date/Time column"
-                    required={isTimeSeries}
-                  />
+                    disabled={!formData.dataset_reference}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Date/Time column" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableColumns.map((col) => (
+                        <SelectItem key={col.name} value={col.name}>
+                          <ColumnItem name={col.name} type={col.type} />
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
+
                 <div className="grid gap-2">
                   <Label>Group Column (Optional)</Label>
-                  <Input
+                  {/* เปลี่ยนเป็น Select */}
+                  <Select
                     value={tsData.group_column}
-                    onChange={(e) =>
-                      setTsData({ ...tsData, group_column: e.target.value })
+                    onValueChange={(val) =>
+                      setTsData({ ...tsData, group_column: val })
                     }
-                    placeholder="e.g. store_id, region"
-                  />
+                    disabled={!formData.dataset_reference}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="e.g. store_id" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem
+                        value="none_grp_col"
+                        className="text-muted-foreground italic"
+                      >
+                        None
+                      </SelectItem>
+                      {availableColumns.map((col) => (
+                        <SelectItem key={col.name} value={col.name}>
+                          <ColumnItem name={col.name} type={col.type} />
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label>Frequency</Label>

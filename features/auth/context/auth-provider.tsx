@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const { data } = await SignUp(credentials);
 
-      localStorage.setItem("access_token", data.access_token);
+      Cookies.set("access_token", data.access_token, { expires: 1, path: "/" });
       setUser(data.user);
 
       router.push("/");
