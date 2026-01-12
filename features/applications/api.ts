@@ -6,7 +6,7 @@ import {
   UpdateAppPayload,
 } from "@/features/applications/types";
 
-export const ListApps = async (params?: { page?: number; limit?: number; public?: boolean }) => {
+export const ListApps = async (params?: { page?: number; limit?: number; public?: boolean; search?: string }) => {
   return axiosInstance.get<AppListResponse>("/projects", { params });
 };
 

@@ -133,7 +133,7 @@ export default function ProjectsPage() {
 
                   {/* Card Body: Info */}
                   <Link
-                    href={`/dashboard/applications/${app.id}`}
+                    href={`/dashboard/projects/${app.id}`}
                     className="block group-hover:text-primary transition-colors"
                   >
                     <h3 className="text-xl font-bold mb-2 line-clamp-1">
@@ -150,36 +150,21 @@ export default function ProjectsPage() {
                       <Target className="w-3.5 h-3.5 mr-2" />
                       Target:{" "}
                       <span className="font-mono ml-1 text-foreground bg-muted px-1 rounded">
-                        {app.target_column}
+                        {app.target}
                       </span>
                     </div>
                     <div className="flex items-center text-xs text-muted-foreground">
                       <Calendar className="w-3.5 h-3.5 mr-2" />
                       Created: {new Date(app.created_at).toLocaleDateString()}
                     </div>
-                    {/* ถ้าเป็น TimeSeries โชว์ความถี่ */}
-                    {app.problem_type === "TIME_SERIES" &&
-                      app.time_series_config && (
-                        <div className="flex items-center text-xs text-muted-foreground">
-                          <Clock className="w-3.5 h-3.5 mr-2" />
-                          Freq:{" "}
-                          <span className="font-mono ml-1">
-                            {app.time_series_config.frequency}
-                          </span>
-                        </div>
-                      )}
                   </div>
 
                   {/* Card Footer: Tags & Action */}
                   <div className="mt-6 pt-4 border-t border-border flex justify-between items-center">
                     <span
-                      className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider ${
-                        app.problem_type === "TIME_SERIES"
-                          ? "bg-purple-500/10 text-purple-600"
-                          : "bg-blue-500/10 text-blue-600"
-                      }`}
+                      className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider bg-blue-500/10 text-blue-600`}
                     >
-                      {app.problem_type?.replace("_", " ") || "REGRESSION"}
+                      Tabular
                     </span>
 
                     <Button
@@ -188,7 +173,7 @@ export default function ProjectsPage() {
                       className="group-hover:translate-x-1 transition-transform"
                       asChild
                     >
-                      <Link href={`/dashboard/applications/${app.id}`}>
+                      <Link href={`/dashboard/projects/${app.id}`}>
                         View <ArrowRight className="w-4 h-4 ml-1" />
                       </Link>
                     </Button>
