@@ -64,9 +64,7 @@ export default function BillingPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="font-medium">Storage Used</span>
-                    <span className="text-muted-foreground">
-                      450 MB / 5 GB
-                    </span>
+                    <span className="text-muted-foreground">450 MB / 5 GB</span>
                   </div>
                   <Progress value={9} className="h-2" />
                 </div>
@@ -101,7 +99,7 @@ export default function BillingPage() {
         </div>
 
         <div className="space-y-6">
-          <Card className="bg-gradient-to-br from-gray-900 to-gray-800 text-white border-0 shadow-xl">
+          <Card className="bg-linear-to-br from-gray-900 to-gray-800 text-white border-0 shadow-xl">
             <CardHeader>
               <CardTitle>Pro Plan</CardTitle>
               <CardDescription className="text-gray-300">
@@ -110,7 +108,8 @@ export default function BillingPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="text-3xl font-bold">
-                $29 <span className="text-lg font-normal text-gray-400">/mo</span>
+                $29{" "}
+                <span className="text-lg font-normal text-gray-400">/mo</span>
               </div>
               <ul className="space-y-3">
                 {[
