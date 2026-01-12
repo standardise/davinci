@@ -40,7 +40,7 @@ export function TabularProjectList() {
       
       // Client-side search if API doesn't support it yet or for simplicity
       const filtered = search 
-        ? data.filter(a => a.name.toLowerCase().includes(search.toLowerCase())) 
+        ? data.filter((a: App) => a.name.toLowerCase().includes(search.toLowerCase())) 
         : data;
         
       setApps(filtered);
