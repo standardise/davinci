@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  "/api/v1";
+  "https://davinci-service-853569108986.asia-southeast3.run.app/api/v1";
 
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
