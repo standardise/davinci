@@ -67,17 +67,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
 
   return (
-    <Sidebar variant="inset" {...props} className="border-r-0">
+    <Sidebar variant="inset" {...props} className="border-r-0 bg-sidebar/80 backdrop-blur-xl">
       <SidebarHeader className="h-16 px-6 flex justify-center">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
               asChild
-              className="hover:bg-transparent"
+              className="hover:bg-transparent active:bg-transparent"
             >
               <a href="/dashboard" className="flex items-center gap-3">
-                <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+                <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40">
                   <Command className="size-5" />
                 </div>
                 <div className="flex flex-col gap-0.5">
@@ -108,17 +108,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenuButton
                     asChild
                     className={cn(
-                      "h-9 gap-3 rounded-md px-4",
+                      "h-9 gap-3 rounded-lg px-4 transition-all duration-200",
                       isActive
-                        ? "bg-primary/10 text-primary font-semibold"
-                        : "text-muted-foreground"
+                        ? "bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20"
+                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                     )}
                   >
                     <a href={item.url}>
                       <item.icon
                         className={cn(
                           "size-4",
-                          isActive ? "text-primary" : "opacity-50"
+                          isActive ? "text-primary-foreground" : "opacity-50"
                         )}
                       />
                       <span className="font-semibold">{item.name}</span>
@@ -143,17 +143,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenuButton
                     asChild
                     className={cn(
-                      "h-9 gap-3 rounded-md px-4",
+                      "h-9 gap-3 rounded-lg px-4 transition-all duration-200",
                       isActive
-                        ? "bg-primary/10 text-primary font-semibold"
-                        : "text-muted-foreground"
+                        ? "bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20"
+                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                     )}
                   >
                     <a href={service.url}>
                       <service.icon
                         className={cn(
                           "size-4",
-                          isActive ? "text-primary" : "opacity-50"
+                          isActive ? "text-primary-foreground" : "opacity-50"
                         )}
                       />
                       <span className="font-semibold">{service.name}</span>
@@ -180,17 +180,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenuButton
                     asChild
                     className={cn(
-                      "h-9 gap-3 rounded-md px-4",
+                      "h-9 gap-3 rounded-lg px-4 transition-all duration-200",
                       isActive
-                        ? "bg-primary/10 text-primary font-semibold"
-                        : "text-muted-foreground"
+                        ? "bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/20"
+                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                     )}
                   >
                     <a href={item.url}>
                       <item.icon
                         className={cn(
                           "size-4",
-                          isActive ? "text-primary" : "opacity-50"
+                          isActive ? "text-primary-foreground" : "opacity-50"
                         )}
                       />
                       <span className="font-semibold">{item.name}</span>

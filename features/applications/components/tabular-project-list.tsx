@@ -34,7 +34,7 @@ export function TabularProjectList() {
   const fetchApps = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await ListApps({ limit: 100 }); // List all for now, maybe pagination later
+      const res = await ListApps({ limit: 100, search }); // List all for now, maybe pagination later
       // Handle different response structures if needed, but type says { data: App[], total... }
       const data = Array.isArray(res.data) ? res.data : (res.data as any).data || [];
       
@@ -102,7 +102,7 @@ export function TabularProjectList() {
           {apps.map((app) => (
             <div
               key={app.id}
-              className="group relative flex flex-col p-6 rounded-3xl border border-border bg-card hover:shadow-xl hover:border-primary/20 transition-all duration-300"
+              className="group relative flex flex-col p-6 rounded-[2rem] border border-border/40 bg-card/60 backdrop-blur-md hover:shadow-2xl hover:border-primary/20 transition-all duration-500 hover:-translate-y-1"
             >
               <div className="flex items-start justify-between mb-4">
                 <ApplicationStatusBadge status={app.status} />

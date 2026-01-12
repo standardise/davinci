@@ -72,7 +72,7 @@ export function PredictionHistoryList({ projectId }: PredictionHistoryListProps)
         </Button>
       </div>
       
-      <div className="rounded-xl border border-border/60 overflow-hidden bg-card/50 shadow-sm">
+      <div className="rounded-2xl border border-border/40 overflow-hidden bg-card/60 backdrop-blur-md shadow-sm">
         <Table>
           <TableHeader className="bg-muted/30">
             <TableRow>

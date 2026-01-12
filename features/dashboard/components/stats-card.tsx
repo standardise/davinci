@@ -20,7 +20,7 @@ export function StatsCard({
 }: StatsCardProps) {
   return (
     <Link href={href} className="block group">
-      <Card className="hover:shadow-lg transition-all duration-300 border-border/60 overflow-hidden relative">
+      <Card className="hover:shadow-xl transition-all duration-500 border-border/40 overflow-hidden relative bg-card/50 backdrop-blur-xl hover:scale-[1.02]">
         <div className="absolute right-0 top-0 p-3 opacity-5 group-hover:opacity-10 transition-opacity transform group-hover:scale-110 duration-500">
           <Icon className="w-24 h-24" />
         </div>
@@ -28,7 +28,7 @@ export function StatsCard({
           <CardTitle className="text-sm font-medium text-muted-foreground">
             {title}
           </CardTitle>
-          <Icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+          <Icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
         </CardHeader>
         <CardContent>
           <div

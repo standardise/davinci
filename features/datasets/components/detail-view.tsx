@@ -236,13 +236,13 @@ function StatsCard({
   value: string;
 }) {
   return (
-    <div className="p-4 rounded-xl border border-border bg-card flex items-center gap-4">
-      <div className="p-3 rounded-lg bg-muted text-muted-foreground">
+    <div className="p-5 rounded-2xl border border-border/40 bg-card/50 backdrop-blur-md shadow-sm flex items-center gap-5 transition-all hover:shadow-md">
+      <div className="p-3.5 rounded-2xl bg-background/80 shadow-sm text-primary">
         <Icon className="w-5 h-5" />
       </div>
       <div>
-        <p className="text-sm text-muted-foreground">{label}</p>
-        <p className="text-xl font-bold tracking-tight">{value}</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{label}</p>
+        <p className="text-2xl font-bold tracking-tight text-foreground">{value}</p>
       </div>
     </div>
   );
