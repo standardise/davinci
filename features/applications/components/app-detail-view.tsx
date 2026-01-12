@@ -553,7 +553,7 @@ export default function AppDetailView({ id }: Props) {
                     </p>
                   </div>
                   <Button variant="destructive" onClick={handleDelete}>
-                    Delete Project
+                    Delete Project.
                   </Button>
                 </CardContent>
               </Card>
