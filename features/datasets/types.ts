@@ -33,6 +33,7 @@ export interface Dataset {
 export interface DatasetQuery {
   page?: number;
   limit?: number;
+  search?: string;
 }
 
 export interface DatasetListResponse {
