@@ -127,7 +127,7 @@ export default function DatasetDetailView({ id }: Props) {
                   variant="outline"
                   className="text-xs font-normal bg-muted/50"
                 >
-                  {dataset.schema.length} columns
+                  {dataset.columns?.length || 0} columns
                 </Badge>
               </div>
               <p className="text-muted-foreground max-w-2xl">
@@ -136,13 +136,6 @@ export default function DatasetDetailView({ id }: Props) {
             </div>
 
             <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={() => window.open(dataset.url, "_blank")}
-              >
-                <Download className="w-4 h-4 mr-2" /> Download
-              </Button>
-
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -182,79 +175,17 @@ export default function DatasetDetailView({ id }: Props) {
             />
           </div>
 
-          <Tabs defaultValue="preview" className="w-full">
+          <Tabs defaultValue="schema" className="w-full">
             <div className="flex items-center justify-between mb-4">
               <TabsList>
-                <TabsTrigger value="preview" className="gap-2">
-                  <TableIcon className="w-4 h-4" /> Data Preview
-                </TabsTrigger>
                 <TabsTrigger value="schema" className="gap-2">
                   <FileJson className="w-4 h-4" /> Schema & Metadata
                 </TabsTrigger>
+                <TabsTrigger value="preview" className="gap-2" disabled>
+                  <TableIcon className="w-4 h-4" /> Data Preview (Coming Soon)
+                </TabsTrigger>
               </TabsList>
             </div>
-
-            <TabsContent
-              value="preview"
-              className="space-y-4 animate-in fade-in slide-in-from-bottom-2"
-            >
-              <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead className="text-xs text-muted-foreground uppercase bg-muted/50 border-b border-border">
-                      <tr>
-                        {dataset.schema.map((col) => (
-                          <th
-                            key={col.name}
-                            className="px-6 py-4 font-medium whitespace-nowrap"
-                          >
-                            <div className="flex flex-col gap-1">
-                              <span>{col.name}</span>
-                              <span className="text-[10px] normal-case opacity-50">
-                                {col.type}
-                              </span>
-                            </div>
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {dataset.preview && dataset.preview.length > 0 ? (
-                        dataset.preview.map((row, idx) => (
-                          <tr
-                            key={idx}
-                            className="border-b border-border hover:bg-muted/20 transition-colors last:border-0"
-                          >
-                            {dataset.schema.map((col) => (
-                              <td
-                                key={`${idx}-${col.name}`}
-                                className="px-6 py-4 whitespace-nowrap text-foreground/80"
-                              >
-                                {String(row[col.name] ?? "-")}
-                              </td>
-                            ))}
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td
-                            colSpan={dataset.schema.length}
-                            className="px-6 py-12 text-center text-muted-foreground"
-                          >
-                            No preview data available.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-                {/* Footer Note */}
-                <div className="px-6 py-3 bg-muted/20 border-t border-border text-xs text-muted-foreground">
-                  Showing first {dataset.preview?.length || 0} rows of{" "}
-                  {dataset.row_count.toLocaleString()}.
-                </div>
-              </div>
-            </TabsContent>
 
             {/* Tab: Schema */}
             <TabsContent
@@ -263,20 +194,26 @@ export default function DatasetDetailView({ id }: Props) {
             >
               <div className="rounded-xl border border-border bg-card overflow-hidden">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-border">
-                  {dataset.schema.map((col, idx) => (
+                  {dataset.columns?.map((col, idx) => (
                     <div
                       key={idx}
-                      className="p-4 flex items-center justify-between hover:bg-muted/20"
+                      className="p-4 flex flex-col gap-2 hover:bg-muted/20"
                     >
-                      <div className="font-medium font-mono text-sm">
-                        {col.name}
+                      <div className="flex items-center justify-between">
+                        <div className="font-medium font-mono text-sm">
+                          {col.name}
+                        </div>
+                        <Badge
+                          variant="secondary"
+                          className="text-xs font-normal uppercase"
+                        >
+                          {col.data_type}
+                        </Badge>
                       </div>
-                      <Badge
-                        variant="secondary"
-                        className="text-xs font-normal"
-                      >
-                        {col.type}
-                      </Badge>
+                      <div className="text-xs text-muted-foreground grid grid-cols-2 gap-2 mt-1">
+                        <div>Missing: {col.stats?.missing_count ?? "-"}</div>
+                        <div>Unique: {col.stats?.unique_count ?? "-"}</div>
+                      </div>
                     </div>
                   ))}
                 </div>

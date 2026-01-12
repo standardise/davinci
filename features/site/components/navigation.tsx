@@ -6,7 +6,7 @@ import { Menu, X, User as UserIcon } from "lucide-react";
 import Link from "next/link";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useAuth } from "@/features/auth/context/auth-provider";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserNav } from "@/features/auth/components/user-nav";
 
 export function Navigation() {
   const { user, isLoading } = useAuth();
@@ -75,18 +75,12 @@ export function Navigation() {
                 <>
                   {user ? (
                     <>
-                      <Button
-                        className="rounded-full px-6 font-medium shadow-lg shadow-primary/20"
-                        asChild
-                      >
-                        <Link href={"/dashboard"}>Dashboard</Link>
-                      </Button>
-                      <Link href={"/dashboard/account"}>
-                        <Avatar>
-                          <AvatarImage src={user.avatar_url} alt={user.name} />
-                          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
+                      <Link href={"/dashboard"}>
+                        <Button className="rounded-full px-6 font-medium shadow-lg shadow-primary/20">
+                          Dashboard
+                        </Button>
                       </Link>
+                      <UserNav />
                     </>
                   ) : (
                     <>

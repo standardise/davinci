@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { FeatureSchema } from "@/features/applications/types";
 import { Input } from "@/components/ui/input";

@@ -123,3 +123,24 @@
     @apply bg-background text-foreground;
   }
 }
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  @keyframes progress {
+    0% { transform: scaleX(0); }
+    50% { transform: scaleX(0.5); }
+    100% { transform: scaleX(1); }
+  }
+
+  .animate-progress {
+    animation: progress 2s infinite linear;
+    transform-origin: left;
+  }
+}

@@ -39,7 +39,7 @@ export const UploadDataset = async ({
   formData.append("description", description);
   formData.append("file", file);
 
-  return axiosInstance.post<Dataset>("/datasets/upload", formData, {
+  return axiosInstance.post<Dataset>("/datasets", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

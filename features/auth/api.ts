@@ -12,7 +12,14 @@ export const SignIn = async (data: { email: string; password: string }) => {
 };
 
 export const SignUp = async (data: RegisterCredentials) => {
-  return axiosInstance.post<LoginResponse>("/auth/signup", data);
+  const formData = new FormData();
+  formData.append("name", data.name);
+  formData.append("email", data.email);
+  formData.append("password", data.password);
+  
+  return axiosInstance.post<LoginResponse>("/auth/signup", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 };
 
 export const GetUserProfile = async () => {

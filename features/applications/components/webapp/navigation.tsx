@@ -5,15 +5,8 @@ import Link from "next/link";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { Button } from "@/components/ui/button";
-import { LogOut, User as UserIcon, Share2, Command, Check } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Share2, Command, Check } from "lucide-react";
+import { UserNav } from "@/features/auth/components/user-nav";
 import { Badge } from "@/components/ui/badge";
 import { GetApp } from "../../api";
 
@@ -97,53 +90,7 @@ export function Navbar({ appId }: WebAppNavbarProps) {
 
           {/* User Profile */}
           {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full hover:bg-muted/50 transition-colors ml-1 outline-none">
-                  <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center overflow-hidden border border-border">
-                    {user.avatar_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={user.avatar_url}
-                        alt="Profile"
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-xs font-bold text-muted-foreground">
-                        {user.name?.charAt(0)}
-                      </span>
-                    )}
-                  </div>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {user.name}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user.email}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem disabled>
-                  <UserIcon className="mr-2 h-4 w-4" /> Account Settings
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="text-red-500 cursor-pointer"
-                  onClick={logout}
-                >
-                  <LogOut className="mr-2 h-4 w-4" /> Sign out
-                </DropdownMenuItem>
-                {/* Powered by footer */}
-                <div className="px-2 py-2 mt-1 border-t text-[10px] text-muted-foreground text-center">
-                  Powered by Davinci
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <UserNav />
           ) : (
             <Button size="sm" asChild className="rounded-full">
               <Link href="/signin">Sign In</Link>

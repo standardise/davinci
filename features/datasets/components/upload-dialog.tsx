@@ -60,11 +60,11 @@ export function UploadDatasetDialog({ onSuccess }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2">
+        <Button className="gap-2 shadow-lg shadow-primary/20">
           <UploadCloud className="w-4 h-4" /> Upload Dataset
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-106.25">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Upload Dataset</DialogTitle>
           <DialogDescription>
@@ -96,9 +96,9 @@ export function UploadDatasetDialog({ onSuccess }: Props) {
           <div className="grid gap-2">
             <Label>File (CSV, Parquet)</Label>
             <div className="border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-muted/50 transition-colors cursor-pointer relative">
-              <Input
+              <input
                 type="file"
-                className="absolute inset-0 opacity-0 cursor-pointer"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-50"
                 onChange={handleFileChange}
                 accept=".csv,.parquet"
               />

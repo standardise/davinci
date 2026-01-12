@@ -10,15 +10,20 @@ import {
   Plus,
   Zap,
 } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { ListApps } from "@/features/applications/api";
 import { ListDatasets } from "@/features/datasets/api";
 import { App } from "@/features/applications/types";
 import { Dataset } from "@/features/datasets/types";
+
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { formatDistanceToNow } from "date-fns";
+import { Card, CardContent } from "@/components/ui/card";
+
+import { StatsCard } from "@/features/dashboard/components/stats-card";
+import { EmptyState } from "@/features/dashboard/components/empty-state";
+import { DashboardSkeleton } from "@/features/dashboard/components/dashboard-skeleton";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -81,7 +86,7 @@ export default function DashboardPage() {
             </Link>
           </Button>
           <Button asChild className="rounded-xl">
-            <Link href="/dashboard/applications">
+            <Link href="/dashboard/projects">
               <Plus className="w-4 h-4 mr-2" /> New Project
             </Link>
           </Button>
@@ -95,7 +100,7 @@ export default function DashboardPage() {
           value={stats.apps}
           icon={LayoutGrid}
           description="Active machine learning apps"
-          href="/dashboard/applications"
+          href="/dashboard/projects"
         />
         <StatsCard
           title="Total Datasets"
@@ -122,7 +127,7 @@ export default function DashboardPage() {
               Recent Projects
             </h2>
             <Button variant="link" asChild className="text-primary">
-              <Link href="/dashboard/applications">
+              <Link href="/dashboard/projects">
                 View All <ArrowRight className="w-4 h-4 ml-1" />
               </Link>
             </Button>
@@ -133,7 +138,7 @@ export default function DashboardPage() {
               {recentApps.map((app) => (
                 <Link
                   key={app.id}
-                  href={`/dashboard/applications/${app.id}`}
+                  href={`/dashboard/projects/${app.id}`}
                   className="group block"
                 >
                   <Card className="hover:shadow-md transition-all duration-300 border-border/60 bg-card/50 hover:bg-card">
@@ -170,7 +175,7 @@ export default function DashboardPage() {
             <EmptyState
               title="No projects yet"
               description="Create your first ML project to get started."
-              href="/dashboard/applications"
+              href="/dashboard/projects"
               actionText="Create Project"
             />
           )}
@@ -233,111 +238,6 @@ export default function DashboardPage() {
               actionText="Upload Data"
             />
           )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StatsCard({
-  title,
-  value,
-  icon: Icon,
-  description,
-  href,
-  valueClassName,
-}: {
-  title: string;
-  value: string | number;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-  description: string;
-  href: string;
-  valueClassName?: string;
-}) {
-  return (
-    <Link href={href} className="block group">
-      <Card className="hover:shadow-lg transition-all duration-300 border-border/60 overflow-hidden relative">
-        <div className="absolute right-0 top-0 p-3 opacity-5 group-hover:opacity-10 transition-opacity transform group-hover:scale-110 duration-500">
-          <Icon className="w-24 h-24" />
-        </div>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            {title}
-          </CardTitle>
-          <Icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-        </CardHeader>
-        <CardContent>
-          <div
-            className={`text-2xl font-bold ${
-              valueClassName || "text-foreground"
-            }`}
-          >
-            {value}
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">{description}</p>
-        </CardContent>
-      </Card>
-    </Link>
-  );
-}
-
-function EmptyState({
-  title,
-  description,
-  href,
-  actionText,
-}: {
-  title: string;
-  description: string;
-  href: string;
-  actionText: string;
-}) {
-  return (
-    <div className="flex flex-col items-center justify-center p-8 border border-dashed border-border rounded-3xl bg-muted/5 text-center h-75">
-      <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
-        <LayoutGrid className="w-6 h-6 text-muted-foreground" />
-      </div>
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="text-sm text-muted-foreground max-w-xs mt-1 mb-6">
-        {description}
-      </p>
-      <Button asChild variant="outline" size="sm">
-        <Link href={href}>{actionText}</Link>
-      </Button>
-    </div>
-  );
-}
-
-function DashboardSkeleton() {
-  return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-64 rounded-lg" />
-          <Skeleton className="h-4 w-96 rounded-lg" />
-        </div>
-        <div className="flex gap-2">
-          <Skeleton className="h-10 w-32 rounded-xl" />
-          <Skeleton className="h-10 w-32 rounded-xl" />
-        </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-32 rounded-xl" />
-        ))}
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="space-y-4">
-          <Skeleton className="h-8 w-40 rounded-lg" />
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-24 rounded-xl" />
-          ))}
-        </div>
-        <div className="space-y-4">
-          <Skeleton className="h-8 w-40 rounded-lg" />
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-24 rounded-xl" />
-          ))}
         </div>
       </div>
     </div>

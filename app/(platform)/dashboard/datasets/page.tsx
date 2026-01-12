@@ -94,13 +94,15 @@ export default function DatasetPage() {
               ))}
             </div>
           ) : datasets.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 border border-dashed border-border rounded-3xl bg-muted/5">
-              <Database className="w-16 h-16 text-muted-foreground/20 mb-4" />
-              <h3 className="text-lg font-semibold text-muted-foreground">
+            <div className="flex flex-col items-center justify-center py-16 border border-dashed border-border rounded-3xl bg-muted/5">
+              <div className="p-4 rounded-full bg-muted/30 mb-4">
+                <Database className="w-8 h-8 text-muted-foreground/50" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground">
                 No datasets found
               </h3>
-              <p className="text-sm text-muted-foreground/60 mb-6">
-                Get started by uploading your first dataset.
+              <p className="text-sm text-muted-foreground/60 mb-6 max-w-sm text-center">
+                Upload your structured data (CSV, Parquet) to start building models.
               </p>
               <UploadDatasetDialog onSuccess={fetchDatasets} />
             </div>
@@ -111,14 +113,17 @@ export default function DatasetPage() {
                   key={dataset.id}
                   className="group relative flex flex-col p-6 rounded-3xl border border-border bg-card hover:shadow-xl hover:border-primary/20 transition-all duration-300"
                 >
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start justify-between mb-4 relative z-10">
                     <div className="p-3 rounded-2xl bg-primary/10 text-primary">
                       <TableIcon className="w-6 h-6" />
                     </div>
 
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
+                        <Button
+                          variant="ghost"
+                          className="h-8 w-8 p-0 hover:bg-muted"
+                        >
                           <MoreVertical className="w-4 h-4 text-muted-foreground" />
                         </Button>
                       </DropdownMenuTrigger>

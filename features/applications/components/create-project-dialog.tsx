@@ -13,7 +13,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -23,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Plus, Loader2 } from "lucide-react";
 import { Dataset } from "@/features/datasets/types";
-import { ListDatasets } from "@/features/datasets/api"; // สมมติว่ามี GetDataset ถ้า List ไม่ส่ง schema มา
+import { ListDatasets, GetDataset } from "@/features/datasets/api";
 import { CreateApp } from "../api";
 
 const ColumnItem = ({ name, type }: { name: string; type: string }) => (
@@ -46,20 +45,14 @@ export function CreateProjectDialog({ onSuccess }: { onSuccess: () => void }) {
   >([]); // 👈 เก็บ Columns ของ Dataset ที่เลือก
 
   // Form State
-  const [isTimeSeries, setIsTimeSeries] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    dataset_reference: "",
-    target_column: "",
-    id_column: "",
-  });
-
-  const [tsData, setTsData] = useState({
-    time_column: "",
-    group_column: "",
-    frequency: "D",
-    forecast_horizon: 7,
+    dataset_id: "",
+    target: "",
+    visibility: "PRIVATE",
+    colour: "blue", // default
+    icon: "default", // default
   });
 
   // Load Datasets
@@ -67,7 +60,8 @@ export function CreateProjectDialog({ onSuccess }: { onSuccess: () => void }) {
     if (open) {
       ListDatasets()
         .then((res) => {
-          const data = Array.isArray(res.data) ? res.data : res.data.data || [];
+          // Handle both pagination structures
+          const data = Array.isArray(res.data) ? res.data : (res.data as any).data || [];
           setDatasets(data);
         })
         .catch(console.error);
@@ -75,22 +69,25 @@ export function CreateProjectDialog({ onSuccess }: { onSuccess: () => void }) {
   }, [open]);
 
   // Handle Dataset Selection
-  const handleDatasetChange = (datasetId: string) => {
+  const handleDatasetChange = async (datasetId: string) => {
     // 1. Update Form
     setFormData((prev) => ({
       ...prev,
-      dataset_reference: datasetId,
-      target_column: "", // Reset columns when dataset changes
-      id_column: "",
+      dataset_id: datasetId,
+      target: "", // Reset columns when dataset changes
     }));
-    setTsData((prev) => ({ ...prev, time_column: "", group_column: "" }));
+    setAvailableColumns([]); // Reset columns while loading
 
-    // 2. Find selected dataset to get columns
-    const selected = datasets.find((d) => d.id === datasetId);
-    if (selected && selected.schema) {
-      setAvailableColumns(selected.schema);
-    } else {
-      setAvailableColumns([]);
+    // 2. Fetch selected dataset details to get columns
+    try {
+      const res = await GetDataset(datasetId);
+      if (res.data && res.data.columns) {
+        setAvailableColumns(
+          res.data.columns.map((c) => ({ name: c.name, type: c.data_type }))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to fetch dataset details", error);
     }
   };
 
@@ -98,22 +95,21 @@ export function CreateProjectDialog({ onSuccess }: { onSuccess: () => void }) {
     e.preventDefault();
     if (
       !formData.name ||
-      !formData.dataset_reference ||
-      !formData.target_column
+      !formData.dataset_id ||
+      !formData.target
     )
       return;
 
     setIsLoading(true);
     try {
       await CreateApp({
-        ...formData,
-        id_column: formData.id_column || undefined,
-        time_series_config: isTimeSeries
-          ? {
-              ...tsData,
-              forecast_horizon: Number(tsData.forecast_horizon),
-            }
-          : undefined,
+        name: formData.name,
+        description: formData.description,
+        dataset_id: formData.dataset_id,
+        target: formData.target,
+        visibility: formData.visibility as "PRIVATE" | "PUBLIC",
+        colour: formData.colour,
+        icon: formData.icon,
       });
 
       setOpen(false);
@@ -131,16 +127,11 @@ export function CreateProjectDialog({ onSuccess }: { onSuccess: () => void }) {
     setFormData({
       name: "",
       description: "",
-      dataset_reference: "",
-      target_column: "",
-      id_column: "",
-    });
-    setIsTimeSeries(false);
-    setTsData({
-      time_column: "",
-      group_column: "",
-      frequency: "D",
-      forecast_horizon: 7,
+      dataset_id: "",
+      target: "",
+      visibility: "PRIVATE",
+      colour: "blue",
+      icon: "default",
     });
     setAvailableColumns([]);
   };
@@ -192,7 +183,7 @@ export function CreateProjectDialog({ onSuccess }: { onSuccess: () => void }) {
               Dataset <span className="text-red-500">*</span>
             </Label>
             <Select
-              value={formData.dataset_reference}
+              value={formData.dataset_id}
               onValueChange={handleDatasetChange}
             >
               <SelectTrigger>
@@ -213,18 +204,17 @@ export function CreateProjectDialog({ onSuccess }: { onSuccess: () => void }) {
               <Label>
                 Target Column <span className="text-red-500">*</span>
               </Label>
-              {/* เปลี่ยนเป็น Select */}
               <Select
-                value={formData.target_column}
+                value={formData.target}
                 onValueChange={(val) =>
-                  setFormData({ ...formData, target_column: val })
+                  setFormData({ ...formData, target: val })
                 }
-                disabled={!formData.dataset_reference}
+                disabled={!formData.dataset_id}
               >
                 <SelectTrigger>
                   <SelectValue
                     placeholder={
-                      formData.dataset_reference
+                      formData.dataset_id
                         ? "Select column"
                         : "Select dataset first"
                     }
@@ -241,141 +231,23 @@ export function CreateProjectDialog({ onSuccess }: { onSuccess: () => void }) {
             </div>
 
             <div className="grid gap-2">
-              <Label>ID Column (Optional)</Label>
-              {/* เปลี่ยนเป็น Select */}
+              <Label>Visibility</Label>
               <Select
-                value={formData.id_column}
+                value={formData.visibility}
                 onValueChange={(val) =>
-                  setFormData({ ...formData, id_column: val })
+                  setFormData({ ...formData, visibility: val })
                 }
-                disabled={!formData.dataset_reference}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select column (Unique ID)" />
+                  <SelectValue placeholder="Select visibility" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem
-                    value="none_id_col"
-                    className="text-muted-foreground italic"
-                  >
-                    None
-                  </SelectItem>
-                  {availableColumns.map((col) => (
-                    <SelectItem key={col.name} value={col.name}>
-                      <ColumnItem name={col.name} type={col.type} />
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="PRIVATE">Private</SelectItem>
+                  <SelectItem value="PUBLIC">Public</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
-
-          {/* Time Series Toggle */}
-          <div className="flex items-center justify-between rounded-lg border p-4 bg-muted/10">
-            <div className="space-y-0.5">
-              <Label className="text-base">Time Series Forecasting</Label>
-              <p className="text-xs text-muted-foreground">
-                Enable if your data has a time component.
-              </p>
-            </div>
-            <Switch checked={isTimeSeries} onCheckedChange={setIsTimeSeries} />
-          </div>
-
-          {/* Time Series Config (Show if Toggled) */}
-          {isTimeSeries && (
-            <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-dashed animate-in slide-in-from-top-2">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label>Time Column</Label>
-                  {/* เปลี่ยนเป็น Select */}
-                  <Select
-                    value={tsData.time_column}
-                    onValueChange={(val) =>
-                      setTsData({ ...tsData, time_column: val })
-                    }
-                    disabled={!formData.dataset_reference}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Date/Time column" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableColumns.map((col) => (
-                        <SelectItem key={col.name} value={col.name}>
-                          <ColumnItem name={col.name} type={col.type} />
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid gap-2">
-                  <Label>Group Column (Optional)</Label>
-                  {/* เปลี่ยนเป็น Select */}
-                  <Select
-                    value={tsData.group_column}
-                    onValueChange={(val) =>
-                      setTsData({ ...tsData, group_column: val })
-                    }
-                    disabled={!formData.dataset_reference}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="e.g. store_id" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem
-                        value="none_grp_col"
-                        className="text-muted-foreground italic"
-                      >
-                        None
-                      </SelectItem>
-                      {availableColumns.map((col) => (
-                        <SelectItem key={col.name} value={col.name}>
-                          <ColumnItem name={col.name} type={col.type} />
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label>Frequency</Label>
-                  <Select
-                    value={tsData.frequency}
-                    onValueChange={(val) =>
-                      setTsData({ ...tsData, frequency: val })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="D">Daily</SelectItem>
-                      <SelectItem value="W">Weekly</SelectItem>
-                      <SelectItem value="M">Monthly</SelectItem>
-                      <SelectItem value="H">Hourly</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-2">
-                  <Label>Forecast Horizon</Label>
-                  <Input
-                    type="number"
-                    value={tsData.forecast_horizon}
-                    onChange={(e) =>
-                      setTsData({
-                        ...tsData,
-                        forecast_horizon: Number(e.target.value),
-                      })
-                    }
-                    placeholder="Steps to predict"
-                    required={isTimeSeries}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
 
           <div className="flex justify-end pt-2">
             <Button type="submit" disabled={isLoading}>
