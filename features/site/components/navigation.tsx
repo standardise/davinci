@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { Menu, X, User as UserIcon } from "lucide-react";
+import { Menu, X, User as UserIcon, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useAuth } from "@/features/auth/context/auth-provider";
@@ -162,33 +162,45 @@ export function Navigation() {
 
             <div className="mt-auto space-y-4 pt-10">
               {user ? (
-                <Button
-                  className="w-full h-14 rounded-2xl text-lg font-bold"
-                  asChild
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <Link href={"/dasboard/account"}>
-                    <UserIcon className="mr-2 h-5 w-5" /> Manage Account
-                  </Link>
-                </Button>
-              ) : (
-                <>
+                <div className="flex flex-col gap-3">
+                  <Button
+                    className="w-full h-14 rounded-2xl text-lg font-bold shadow-lg shadow-primary/20"
+                    asChild
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Link href={"/dashboard"}>
+                      <LayoutDashboard className="mr-2 h-5 w-5" /> Go to Dashboard
+                    </Link>
+                  </Button>
                   <Button
                     variant="outline"
-                    className="w-full h-14 rounded-2xl text-lg border-border"
+                    className="w-full h-14 rounded-2xl text-lg font-medium border-border/60 hover:bg-muted/50"
+                    asChild
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Link href={"/dashboard/account"}>
+                      <UserIcon className="mr-2 h-5 w-5" /> Manage Account
+                    </Link>
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <Button
+                    variant="outline"
+                    className="w-full h-14 rounded-2xl text-lg font-medium border-border/60 hover:bg-muted/50"
                     asChild
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Link href={"/signin"}>Sign in</Link>
                   </Button>
                   <Button
-                    className="w-full h-14 rounded-2xl text-lg font-bold"
+                    className="w-full h-14 rounded-2xl text-lg font-bold shadow-lg shadow-primary/20"
                     asChild
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Link href={"/dashboard"}>Get Started</Link>
                   </Button>
-                </>
+                </div>
               )}
             </div>
           </div>
