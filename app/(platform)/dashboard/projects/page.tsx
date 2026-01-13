@@ -62,7 +62,7 @@ export default function ProjectsPage() {
   return (
     <AuthGuard>
       <div className="min-h-screen bg-background pb-12">
-        <div className="container mx-auto px-4 lg:px-8 max-w-7xl">
+        <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Projects</h1>

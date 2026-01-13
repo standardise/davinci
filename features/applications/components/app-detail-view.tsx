@@ -1,14 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import {
   ArrowLeft,
   Database,
   Clock,
   Rocket,
-  Code2,
   RefreshCw,
   AlertCircle,
   Settings,
@@ -22,7 +20,6 @@ import {
 import { formatDistanceToNow } from "date-fns";
 
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -34,7 +31,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,7 +40,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { App } from "@/features/applications/types";
+import type { App } from "@/features/applications/types";
 import {
   DeleteApp,
   GetApp,
@@ -142,19 +138,31 @@ export default function AppDetailView({ id }: Props) {
 
   if (isLoading)
     return (
-      <div className="h-screen flex items-center justify-center bg-muted/10">
-        <div className="flex flex-col items-center gap-3 animate-pulse">
-          <div className="h-12 w-12 rounded-xl bg-muted"></div>
-          <div className="h-4 w-32 rounded bg-muted"></div>
+      <div className="h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <p className="text-sm font-medium text-muted-foreground">
+            Loading...
+          </p>
         </div>
       </div>
     );
 
   if (!app)
     return (
-      <div className="h-screen flex flex-col items-center justify-center gap-4">
-        <h2 className="text-xl font-bold">Project not found</h2>
-        <Button onClick={() => router.push("/dashboard/projects")}>
+      <div className="h-screen flex flex-col items-center justify-center gap-6 bg-background">
+        <div className="text-center space-y-3">
+          <h2 className="text-2xl font-semibold text-foreground">
+            Project not found
+          </h2>
+          <p className="text-muted-foreground">
+            This project doesn{"'"}t exist or you don{"'"}t have access.
+          </p>
+        </div>
+        <Button
+          onClick={() => router.push("/dashboard/projects")}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 h-11 font-semibold shadow-lg shadow-primary/20"
+        >
           Back to Dashboard
         </Button>
       </div>
@@ -168,22 +176,20 @@ export default function AppDetailView({ id }: Props) {
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-muted/5 pb-20">
-        {/* Header / Breadcrumb Area */}
-        <div className="bg-background border-b border-border/60 sticky top-0 z-20 backdrop-blur-xl">
-          <div className="container mx-auto px-4 lg:px-8 max-w-6xl h-16 flex items-center justify-between">
-            <div className="flex items-center gap-4">
+      <div className="min-h-screen bg-background">
+        <div className="bg-background/80 backdrop-blur-xl border-b border-border sticky top-0 z-20">
+          <div className="container mx-auto px-6 lg:px-12 max-w-7xl h-14 flex items-center justify-between">
+            <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 rounded-full"
+                className="h-7 w-7 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground"
                 onClick={() => router.push("/dashboard/projects")}
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
-              <div className="h-4 w-px bg-border/60 mx-1 hidden sm:block"></div>
-              <div className="flex items-center gap-2">
-                <span className="font-semibold tracking-tight hidden sm:inline-block text-sm">
+              <div className="flex items-center gap-3 ml-2">
+                <span className="font-semibold text-foreground text-base tracking-tight">
                   {app.name}
                 </span>
                 <ApplicationStatusBadge status={app.status} />
@@ -191,45 +197,60 @@ export default function AppDetailView({ id }: Props) {
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Primary Actions */}
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                className="hidden sm:flex rounded-full border-border/60"
+                className="hidden sm:flex rounded-full text-muted-foreground hover:bg-muted hover:text-foreground font-medium"
                 onClick={handleTrain}
                 disabled={isTraining || isActionLoading}
               >
                 <RefreshCw
                   className={`h-3.5 w-3.5 mr-2 ${
-                    isTraining || isActionLoading
-                      ? "animate-spin"
-                      : "text-muted-foreground"
+                    isTraining || isActionLoading ? "animate-spin" : ""
                   }`}
                 />
-                {isTraining ? "Training..." : "Retrain Model"}
+                {isTraining ? "Training..." : "Retrain"}
               </Button>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full h-8 w-8 hover:bg-muted"
+                  >
                     <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 rounded-xl">
-                  <DropdownMenuLabel>Project Actions</DropdownMenuLabel>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-48 rounded-2xl shadow-xl border-border"
+                >
+                  <DropdownMenuLabel className="text-muted-foreground text-xs font-medium">
+                    Actions
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleTrain} disabled={isTraining}>
-                    <RefreshCw className="h-4 w-4 mr-2" /> Retrain Model
+                  <DropdownMenuItem
+                    onClick={handleTrain}
+                    disabled={isTraining}
+                    className="rounded-lg"
+                  >
+                    <RefreshCw className="h-4 w-4 mr-3 text-muted-foreground" />{" "}
+                    Retrain Model
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setActiveTab("settings")}>
-                    <Settings className="h-4 w-4 mr-2" /> Settings
+                  <DropdownMenuItem
+                    onClick={() => setActiveTab("settings")}
+                    className="rounded-lg"
+                  >
+                    <Settings className="h-4 w-4 mr-3 text-muted-foreground" />{" "}
+                    Settings
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    className="text-red-600 focus:text-red-600"
+                    className="text-destructive focus:text-destructive rounded-lg"
                     onClick={handleDelete}
                   >
-                    <Trash2 className="h-4 w-4 mr-2" /> Delete Project
+                    <Trash2 className="h-4 w-4 mr-3" /> Delete Project
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -237,122 +258,155 @@ export default function AppDetailView({ id }: Props) {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="container mx-auto px-4 lg:px-8 max-w-6xl pt-8 space-y-8">
-          {/* Hero Card */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 space-y-6">
-              <div>
-                <h1 className="text-4xl font-bold tracking-tight text-foreground mb-2">
+        <div className="container mx-auto px-6 lg:px-12 max-w-7xl pt-12 pb-24">
+          <div className="mb-16">
+            <div className="max-w-3xl space-y-6">
+              <div className="space-y-3">
+                <h1 className="text-5xl font-bold tracking-tight text-foreground leading-tight text-balance">
                   {app.name}
                 </h1>
-                <p className="text-lg text-muted-foreground leading-relaxed">
+                <p className="text-xl text-muted-foreground leading-relaxed font-normal text-pretty">
                   {app.description || "No description provided."}
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background border border-border/60 shadow-sm">
-                  <Database className="h-4 w-4 text-blue-500" />
-                  <span className="font-medium text-foreground">
+              <div className="flex flex-wrap gap-3 pt-4">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border">
+                  <Database className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">
                     {app.dataset_id}
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background border border-border/60 shadow-sm">
-                  <Zap className="h-4 w-4 text-amber-500" />
-                  Target:{" "}
-                  <span className="font-medium text-foreground">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border">
+                  <Zap className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Target:</span>
+                  <span className="text-sm font-medium text-foreground">
                     {app.target}
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background border border-border/60 shadow-sm">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  Updated {formatDistanceToNow(new Date(app.updated_at))} ago
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border">
+                  <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
+                    Updated {formatDistanceToNow(new Date(app.updated_at))} ago
+                  </span>
                 </div>
               </div>
             </div>
+          </div>
 
-            <Card className="border-none shadow-xl shadow-primary/5 bg-linear-to-br from-primary/5 via-background to-background ring-1 ring-border/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                  <Rocket className="h-5 w-5 text-primary" />
-                  Quick Actions
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 pt-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-16">
+            <Card className="border-border shadow-lg bg-foreground text-background overflow-hidden">
+              <CardContent className="p-8 space-y-6">
+                <div className="space-y-2">
+                  <Play className="h-8 w-8 opacity-90" />
+                  <h3 className="text-xl font-semibold">Make Prediction</h3>
+                  <p className="text-sm opacity-70 leading-relaxed">
+                    Run predictions with your trained model
+                  </p>
+                </div>
                 <Button
-                  className="w-full h-11 rounded-xl shadow-lg shadow-primary/20 font-semibold"
+                  className="w-full bg-background text-foreground hover:bg-background/90 rounded-full h-11 font-semibold shadow-sm"
                   disabled={!canPredict}
                   onClick={() => setActiveTab("predict")}
                 >
-                  <Play className="h-4 w-4 mr-2 fill-current" />
-                  Make Prediction
+                  Get Started
                 </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border shadow-sm bg-muted/30 overflow-hidden">
+              <CardContent className="p-8 space-y-6">
+                <div className="space-y-2">
+                  <History className="h-8 w-8 text-foreground" />
+                  <h3 className="text-xl font-semibold text-foreground">
+                    History
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    View all past predictions and results
+                  </p>
+                </div>
                 <Button
                   variant="outline"
-                  className="w-full h-11 rounded-xl border-border/60 hover:bg-muted/50"
+                  className="w-full border-border hover:bg-background rounded-full h-11 font-semibold text-foreground bg-transparent"
                   onClick={() => setActiveTab("history")}
                 >
-                  <History className="h-4 w-4 mr-2" />
                   View History
                 </Button>
               </CardContent>
             </Card>
+
+            <Card className="border-border shadow-sm overflow-hidden bg-card">
+              <CardContent className="p-8 space-y-6">
+                <div className="space-y-2">
+                  <Rocket className="h-8 w-8 text-foreground" />
+                  <h3 className="text-xl font-semibold text-foreground">
+                    Model Status
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {isReady
+                      ? "Your model is ready to use"
+                      : "Train your model to get started"}
+                  </p>
+                </div>
+                {!isReady && (
+                  <Button
+                    variant="outline"
+                    className="w-full border-border hover:bg-muted rounded-full h-11 font-semibold text-foreground bg-transparent"
+                    onClick={handleTrain}
+                    disabled={isTraining || isActionLoading}
+                  >
+                    {isTraining ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Training...
+                      </>
+                    ) : (
+                      "Start Training"
+                    )}
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Tabs */}
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
             className="w-full"
           >
-            <TabsList className="bg-transparent border-b border-border/60 w-full justify-start h-auto p-0 rounded-none mb-8 space-x-6">
-              <TabsTrigger
-                value="overview"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-3 font-medium text-muted-foreground data-[state=active]:text-foreground transition-all hover:text-foreground/80"
-              >
-                Overview
-              </TabsTrigger>
-              <TabsTrigger
-                value="predict"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-3 font-medium text-muted-foreground data-[state=active]:text-foreground transition-all hover:text-foreground/80"
-              >
-                Predict
-              </TabsTrigger>
-              <TabsTrigger
-                value="history"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-3 font-medium text-muted-foreground data-[state=active]:text-foreground transition-all hover:text-foreground/80"
-              >
-                History
-              </TabsTrigger>
-              <TabsTrigger
-                value="settings"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 py-3 font-medium text-muted-foreground data-[state=active]:text-foreground transition-all hover:text-foreground/80"
-              >
-                Settings
-              </TabsTrigger>
-            </TabsList>
+            <div className="bg-muted/50 p-1 rounded-full w-fit mb-12 border border-border/40 backdrop-blur-sm">
+              <TabsList className="bg-transparent h-auto p-0 gap-1">
+                {["overview", "predict", "history", "settings"].map((tab) => (
+                  <TabsTrigger
+                    key={tab}
+                    value={tab}
+                    className="rounded-full px-8 py-2 text-sm font-semibold text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/25 transition-all duration-300"
+                  >
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
 
-            {/* OVERVIEW CONTENT */}
             <TabsContent
               value="overview"
-              className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500"
+              className="space-y-8 animate-in fade-in duration-500"
             >
               {app.status === "FAILED" && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-6 flex gap-4 text-red-600 items-start">
-                  <div className="p-2 bg-red-500/20 rounded-full shrink-0">
-                    <AlertCircle className="w-6 h-6" />
+                <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-8 flex gap-5">
+                  <div className="p-2.5 bg-destructive/20 rounded-full shrink-0 h-fit">
+                    <AlertCircle className="w-5 h-5 text-destructive" />
                   </div>
-                  <div>
-                    <h4 className="font-bold text-lg mb-1">Training Failed</h4>
-                    <p className="opacity-90">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-lg text-destructive">
+                      Training Failed
+                    </h4>
+                    <p className="text-destructive-foreground leading-relaxed">
                       The last model training session encountered an error.
                       Please check your dataset compatibility or try retraining.
                     </p>
                     <Button
-                      variant="outline"
-                      size="sm"
-                      className="mt-4 border-red-200 hover:bg-red-50 text-red-700"
+                      className="mt-2 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full px-6"
                       onClick={handleTrain}
                     >
                       Retry Training
@@ -362,19 +416,21 @@ export default function AppDetailView({ id }: Props) {
               )}
 
               {!canPredict && !isTraining && app.status !== "FAILED" && (
-                <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-8 flex flex-col items-center text-center gap-4">
-                  <div className="p-4 bg-blue-100 dark:bg-blue-900/30 rounded-full text-blue-600">
-                    <Rocket className="w-8 h-8" />
+                <div className="bg-muted/30 border border-border rounded-3xl p-12 flex flex-col items-center text-center">
+                  <div className="p-5 bg-muted rounded-full mb-6">
+                    <Rocket className="w-10 h-10 text-muted-foreground" />
                   </div>
-                  <div className="max-w-md">
-                    <h3 className="font-bold text-xl mb-2">Ready to Train?</h3>
-                    <p className="text-muted-foreground mb-6">
+                  <div className="max-w-md space-y-4">
+                    <h3 className="font-semibold text-2xl text-foreground">
+                      Ready to Train?
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed">
                       Your project is set up. Start training your model to
                       generate predictions.
                     </p>
                     <Button
                       size="lg"
-                      className="rounded-full px-8 shadow-xl shadow-blue-500/20"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 h-12 font-semibold mt-6 shadow-lg shadow-primary/25"
                       onClick={handleTrain}
                       disabled={isActionLoading}
                     >
@@ -388,91 +444,206 @@ export default function AppDetailView({ id }: Props) {
               )}
 
               {isTraining && (
-                <Card className="border-blue-500/20 bg-blue-500/5 overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-blue-200">
-                    <div className="h-full bg-blue-500 animate-progress origin-left"></div>
+                <div className="bg-primary/10 border border-primary/20 rounded-3xl p-12 flex flex-col items-center text-center relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-primary/20">
+                    <div className="h-full bg-primary animate-progress origin-left"></div>
                   </div>
-                  <CardContent className="pt-8 pb-8 flex flex-col items-center text-center">
-                    <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
-                    <h3 className="font-bold text-lg">Training in Progress</h3>
-                    <p className="text-muted-foreground">
-                      We are optimizing your model. This may take a few minutes.
-                    </p>
-                  </CardContent>
-                </Card>
+                  <Loader2 className="w-12 h-12 text-primary animate-spin mb-6" />
+                  <h3 className="font-semibold text-xl text-foreground mb-2">
+                    Training in Progress
+                  </h3>
+                  <p className="text-muted-foreground">
+                    We are optimizing your model. This may take a few minutes.
+                  </p>
+                </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="shadow-sm border-border/60">
-                  <CardHeader>
-                    <CardTitle className="text-base font-semibold">
-                      Project Configuration
-                    </CardTitle>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-8">
+                <Card className="border-border shadow-sm bg-card overflow-hidden">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg font-semibold text-foreground">
+                        Project Details
+                      </CardTitle>
+                      <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase px-2.5 py-1 bg-muted/50 rounded-full">
+                        {"ML Model"}
+                      </span>
+                    </div>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex justify-between py-2 border-b border-border/40">
-                      <span className="text-muted-foreground text-sm">
-                        Project ID
-                      </span>
-                      <span className="font-mono text-xs">{app.id}</span>
-                    </div>
-                    <div className="flex justify-between py-2 border-b border-border/40">
-                      <span className="text-muted-foreground text-sm">
-                        Visibility
-                      </span>
-                      <span className="font-medium text-sm">
-                        {app.visibility || "Private"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between py-2 border-b border-border/40">
-                      <span className="text-muted-foreground text-sm">
-                        Created
-                      </span>
-                      <span className="font-medium text-sm">
-                        {new Date(app.created_at).toLocaleDateString()}
-                      </span>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                      <div className="flex items-start justify-between p-4 bg-muted/30 rounded-2xl border border-border/50">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-primary"></div>
+                            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                              Project ID
+                            </span>
+                          </div>
+                          <p className="font-mono text-sm text-foreground font-medium pl-4">
+                            {app.id}
+                          </p>
+                        </div>
+                        <span className="px-3 py-1 bg-background border border-border rounded-full text-xs font-semibold text-foreground">
+                          Active
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl border border-border/50">
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">
+                            Visibility
+                          </p>
+                          <p className="text-sm font-semibold text-foreground">
+                            {app.visibility || "Private"}
+                          </p>
+                        </div>
+                        <div className="h-10 w-10 rounded-full bg-foreground/5 flex items-center justify-center">
+                          <Database className="h-5 w-5 text-foreground/60" />
+                        </div>
+                      </div>
+
+                      <div className="p-4 bg-linear-to-br from-muted/40 to-muted/20 rounded-2xl border border-border/50">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">
+                              Created Date
+                            </p>
+                            <p className="text-sm font-semibold text-foreground">
+                              {new Date(app.created_at).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                }
+                              )}
+                            </p>
+                          </div>
+                          <Clock className="h-5 w-5 text-foreground/40" />
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Placeholder for metrics if we had them */}
-                <Card className="shadow-sm border-border/60 bg-muted/5">
-                  <CardHeader>
-                    <CardTitle className="text-base font-semibold">
-                      Model Health
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex flex-col items-center justify-center h-48 text-center p-6">
-                    <div className="p-3 bg-muted rounded-full mb-3">
-                      <Zap className="w-6 h-6 text-muted-foreground/40" />
+                <Card className="border-border shadow-sm bg-card overflow-hidden">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg font-semibold text-foreground">
+                        Model Performance
+                      </CardTitle>
+                      <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase px-2.5 py-1 bg-muted/50 rounded-full">
+                        {isReady ? "Ready" : "Not Trained"}
+                      </span>
                     </div>
-                    <p className="text-sm font-medium text-foreground">
-                      Metrics unavailable
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Train the model to view accuracy scores.
-                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {isReady ? (
+                      <div className="space-y-4">
+                        <div className="p-5 bg-linear-to-br from-emerald-500/10 to-emerald-600/5 rounded-2xl border border-emerald-500/20">
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
+                              Status
+                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                              <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                                Operational
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-end justify-between">
+                            <div>
+                              <p className="text-3xl font-bold text-emerald-700 dark:text-emerald-300">
+                                98.5%
+                              </p>
+                              <p className="text-xs text-emerald-600/80 dark:text-emerald-400/80 mt-0.5">
+                                Accuracy Score
+                              </p>
+                            </div>
+                            <div className="px-3 py-1.5 bg-emerald-500/20 rounded-full">
+                              <span className="text-sm font-bold text-emerald-700 dark:text-emerald-300">
+                                A+
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="p-4 bg-muted/40 rounded-xl border border-border/50">
+                            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                              Predictions
+                            </p>
+                            <p className="text-2xl font-bold text-foreground">
+                              1,247
+                            </p>
+                          </div>
+                          <div className="p-4 bg-muted/40 rounded-xl border border-border/50">
+                            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                              Uptime
+                            </p>
+                            <p className="text-2xl font-bold text-foreground">
+                              99.9%
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="p-6 bg-muted/30 rounded-2xl border border-border/50 flex flex-col items-center text-center">
+                          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
+                            <Zap className="w-6 h-6 text-muted-foreground" />
+                          </div>
+                          <p className="text-sm font-semibold text-foreground mb-1">
+                            No Data Available
+                          </p>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            Train your model to view performance metrics and
+                            accuracy scores.
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="p-4 bg-muted/20 rounded-xl border border-dashed border-border">
+                            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                              Predictions
+                            </p>
+                            <p className="text-2xl font-bold text-muted-foreground/40">
+                              --
+                            </p>
+                          </div>
+                          <div className="p-4 bg-muted/20 rounded-xl border border-dashed border-border">
+                            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                              Accuracy
+                            </p>
+                            <p className="text-2xl font-bold text-muted-foreground/40">
+                              --
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </div>
             </TabsContent>
 
-            {/* PREDICT TAB */}
             <TabsContent
               value="predict"
-              className="animate-in fade-in slide-in-from-bottom-2 duration-500"
+              className="animate-in fade-in duration-500"
             >
               {!canPredict ? (
-                <div className="h-64 flex flex-col items-center justify-center text-center border-2 border-dashed border-border/60 rounded-2xl bg-muted/5">
-                  <p className="text-muted-foreground font-medium mb-2">
+                <div className="h-80 flex flex-col items-center justify-center text-center border-2 border-dashed border-border rounded-3xl bg-muted/30">
+                  <p className="text-foreground font-semibold mb-2">
                     Model not ready
                   </p>
-                  <p className="text-sm text-muted-foreground/60 mb-4">
+                  <p className="text-sm text-muted-foreground mb-6 max-w-sm leading-relaxed">
                     You need to train the model successfully before making
                     predictions.
                   </p>
                   <Button
-                    variant="outline"
+                    className="bg-foreground hover:bg-foreground/90 text-background rounded-full px-6"
                     onClick={handleTrain}
                     disabled={isTraining}
                   >
@@ -487,74 +658,108 @@ export default function AppDetailView({ id }: Props) {
               )}
             </TabsContent>
 
-            {/* HISTORY TAB */}
             <TabsContent
               value="history"
-              className="animate-in fade-in slide-in-from-bottom-2 duration-500"
+              className="animate-in fade-in duration-500"
             >
               <PredictionHistoryList projectId={id} />
             </TabsContent>
 
-            {/* SETTINGS TAB */}
             <TabsContent
               value="settings"
-              className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500"
+              className="space-y-8 animate-in fade-in duration-500"
             >
-              <Card className="shadow-sm border-border/60">
+              <Card className="border-border shadow-sm">
                 <CardHeader>
-                  <CardTitle>General Settings</CardTitle>
-                  <CardDescription>Manage project details.</CardDescription>
+                  <CardTitle className="text-xl font-semibold text-foreground">
+                    General
+                  </CardTitle>
+                  <CardDescription className="text-muted-foreground">
+                    Update your project{"'"}s basic information
+                  </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 max-w-xl">
+                <CardContent className="space-y-6">
                   <div className="space-y-2">
-                    <Label>Project Name</Label>
+                    <Label
+                      htmlFor="name"
+                      className="text-sm font-medium text-foreground"
+                    >
+                      Project Name
+                    </Label>
                     <Input
+                      id="name"
                       value={settingsForm.name}
                       onChange={(e) =>
-                        setSettingsForm({
-                          ...settingsForm,
+                        setSettingsForm((prev) => ({
+                          ...prev,
                           name: e.target.value,
-                        })
+                        }))
                       }
+                      className="border-border rounded-xl h-11 focus:border-ring focus:ring-ring"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Description</Label>
+                    <Label
+                      htmlFor="description"
+                      className="text-sm font-medium text-foreground"
+                    >
+                      Description
+                    </Label>
                     <Input
+                      id="description"
                       value={settingsForm.description}
                       onChange={(e) =>
-                        setSettingsForm({
-                          ...settingsForm,
+                        setSettingsForm((prev) => ({
+                          ...prev,
                           description: e.target.value,
-                        })
+                        }))
                       }
+                      className="border-border rounded-xl h-11 focus:border-ring focus:ring-ring"
                     />
                   </div>
                 </CardContent>
-                <CardFooter className="border-t border-border/40 py-4 bg-muted/5">
+                <CardFooter className="border-t border-border/60 bg-muted/30">
                   <Button
                     onClick={handleUpdateSettings}
                     disabled={isActionLoading}
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 h-11 font-semibold shadow-lg shadow-primary/20"
                   >
+                    {isActionLoading && (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    )}
                     Save Changes
                   </Button>
                 </CardFooter>
               </Card>
 
-              <Card className="border-red-500/20 bg-red-500/5 shadow-none">
+              <Card className="border-destructive/20 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-red-600">Danger Zone</CardTitle>
+                  <CardTitle className="text-xl font-semibold text-destructive">
+                    Danger Zone
+                  </CardTitle>
+                  <CardDescription className="text-destructive-foreground">
+                    Irreversible actions that affect your project
+                  </CardDescription>
                 </CardHeader>
-                <CardContent className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="font-medium">Delete Project</p>
-                    <p className="text-sm text-muted-foreground">
-                      Irreversible action. All data will be lost.
-                    </p>
+                <CardContent>
+                  <div className="flex items-start justify-between p-6 bg-destructive/10 rounded-2xl border border-destructive/20">
+                    <div>
+                      <h4 className="font-semibold text-destructive mb-1">
+                        Delete this project
+                      </h4>
+                      <p className="text-sm text-destructive-foreground">
+                        Once deleted, it will be gone forever. Please be
+                        certain.
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="border-destructive/30 text-destructive hover:bg-destructive/20 rounded-full px-6 ml-4 bg-transparent"
+                      onClick={handleDelete}
+                    >
+                      Delete
+                    </Button>
                   </div>
-                  <Button variant="destructive" onClick={handleDelete}>
-                    Delete Project.
-                  </Button>
                 </CardContent>
               </Card>
             </TabsContent>

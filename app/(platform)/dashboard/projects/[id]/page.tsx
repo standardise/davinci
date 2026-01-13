@@ -10,5 +10,9 @@ export default function ProjectPage({
 }) {
   const { id } = use(params);
 
-  return <AppDetailView id={id} />;
+  return (
+    <div>
+      <AppDetailView id={id} />
+    </div>
+  );
 }

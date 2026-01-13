@@ -17,6 +17,7 @@ export interface PredictionLog {
   status: PredictionStatus;
   error_msg?: string;
   row_count: number;
+  metadata?: Record<string, any>;
   created_at: string;
   started_at?: string;
   finished_at?: string;
